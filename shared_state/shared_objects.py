@@ -52,13 +52,13 @@ class ComplexProducer(AbstractProducer):
 
 
 class AbstractShared(ABC):
-    @abstractmethod
-    def __init__(self, obj=None):
-        pass
-
-    @abstractmethod
-    def start(self, obj=None):
-        pass
+    shared_obj = None
+    process_ids = None
+    resource_tracker = None
+    pid = os.getpid()
+    obj = None
+    addr = ("localhost", 6000)
+    secret = bytes("secret".encode("utf-8"))
 
     def listen(self, func=None, args=None):
         listener = Listener(self.addr, authkey=self.secret)
@@ -84,6 +84,25 @@ class AbstractShared(ABC):
             conn.send(value)
             conn.send("close")
         self.sent_queue.append(value)
+
+    @classmethod
+    def clean_up(cls):
+        cls.shared_obj.shm.close()
+        cls.process_ids.shm.close()
+        if not isinstance(cls.obj, type(None)):
+            cls.shared_obj.shm.unlink()
+            cls.process_ids.shm.unlink()
+        cls.resource_tracker.unregister("SharedState", "shared_memory")
+        cls.resource_tracker.unregister("ProcessId", "shared_memory")
+        del cls.shared_obj
+        del cls.process_ids
+        print("Destroyed shared resources")
+
+        p = psutil.Process(cls.pid)
+        for i in p.children(recursive=True):
+            p_temp = psutil.Process(i.pid)
+            p_temp.kill()
+        print(f"Killed all child processes")
 
     @property
     def pickled(self):
@@ -120,21 +139,12 @@ class AbstractShared(ABC):
 
 
 class SimpleSharedOne(AbstractShared):
-    shared_obj = None
-    process_ids = None
-    resource_tracker = None
-    pid = None
-    obj = None
-
     def __init__(self, obj):
         self.obj = obj
-        self.addr = ("localhost", 6000)
-        self.secret = bytes("secret".encode("utf-8"))
         self.rec_queue = []
         self.sent_queue = []
-        self.pid = os.getpid()
 
-    def start(self, obj=None):
+    def start(self):
         self.shared_obj = ShareableList([self.pickled], name="SharedState")
         self.process_ids = ShareableList(["" for i in range(10)], name="ProcessId")
         self.resource_tracker = ResourceTracker()
@@ -149,47 +159,14 @@ class SimpleSharedOne(AbstractShared):
         SimpleSharedOne.obj = self.obj
         self._unpickled = pickle.loads(self.shared_obj[-1])
 
-    @staticmethod
-    def clean_up_one():
-        """atexit was double registering, need to find a workaround for this"""
-        SimpleSharedOne.clean_up()
-
-    @staticmethod
-    def clean_up():
-        SimpleSharedOne.shared_obj.shm.close()
-        SimpleSharedOne.process_ids.shm.close()
-        if not isinstance(SimpleSharedOne.obj, type(None)):
-            SimpleSharedOne.shared_obj.shm.unlink()
-            SimpleSharedOne.process_ids.shm.unlink()
-        SimpleSharedOne.resource_tracker.unregister("SharedState", "shared_memory")
-        SimpleSharedOne.resource_tracker.unregister("ProcessId", "shared_memory")
-        del SimpleSharedOne.shared_obj
-        del SimpleSharedOne.process_ids
-        print("Destroyed shared resources")
-
-        p = psutil.Process(SimpleSharedOne.pid)
-        for i in p.children(recursive=True):
-            p_temp = psutil.Process(i.pid)
-            p_temp.kill()
-        print(f"Killed all child processes")
-
 
 class SimpleSharedTwo(AbstractShared):
-    shared_obj = None
-    process_ids = None
-    resource_tracker = None
-    pid = None
-    obj = None
-
-    def __init__(self, obj):
+    def __init__(self, obj=None):
         self.obj = obj
-        self.addr = ("localhost", 6000)
-        self.secret = bytes("secret".encode("utf-8"))
         self.rec_queue = []
         self.sent_queue = []
-        self.pid = os.getpid()
 
-    def start(self, obj=None):
+    def start(self):
         self.shared_obj = ShareableList(name="SharedState")
         self.process_ids = ShareableList(name="ProcessId")
         self.resource_tracker = ResourceTracker()
@@ -203,30 +180,6 @@ class SimpleSharedTwo(AbstractShared):
         SimpleSharedTwo.obj = self.obj
         self.process_ids[0] = self.pid
         self._unpickled = pickle.loads(self.shared_obj[-1])
-
-    @staticmethod
-    def clean_up():
-        print("before2:")
-        print(SimpleSharedTwo.shared_obj)
-        print(SimpleSharedTwo.process_ids)
-        SimpleSharedTwo.shared_obj.shm.close()
-        SimpleSharedTwo.process_ids.shm.close()
-        print("after2:")
-        if not isinstance(SimpleSharedTwo.obj, type(None)):
-            print("unlinked")
-            SimpleSharedTwo.shared_obj.shm.unlink()
-            SimpleSharedTwo.process_ids.shm.unlink()
-        SimpleSharedTwo.resource_tracker.unregister("SharedState", "shared_memory")
-        SimpleSharedTwo.resource_tracker.unregister("ProcessId", "shared_memory")
-        del SimpleSharedTwo.shared_obj
-        del SimpleSharedTwo.process_ids
-        print("Destroyed shared resources")
-
-        p = psutil.Process(SimpleSharedTwo.pid)
-        for i in p.children(recursive=True):
-            p_temp = psutil.Process(i.pid)
-            p_temp.kill()
-        print(f"Killed all child processes")
 
 
 class ComplexSharedOne(AbstractShared):
