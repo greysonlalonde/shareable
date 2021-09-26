@@ -1,17 +1,27 @@
-from shared_objects import SharedStateCreator
+from .shared_objects import SharedStateCreator
 from functools import wraps
 import pickle
+import atexit
 import psutil
 
 
 def on_start(cls):
+    print("done")
+
     @wraps(cls)
     def inner(self=None, *method_args, **method_kwargs):
         method = None
         for k, v in cls.__dict__.items():
             if k == "run":
-                method = cls(self, *method_args, **method_kwargs)
-                method.run()
+                try:
+                    method = cls(self, *method_args, **method_kwargs)
+                    print(method.shared_state.__dict__)
+                    method.run()
+                    atexit.register(method.shared_state.clean_up)
+
+                except FileNotFoundError:
+                    print("Shared object space has not been allocated")
+                    break
         return method
 
     return inner
@@ -38,7 +48,7 @@ class SharedState:
             try:
                 self.pop("b")
             # for pandas objects
-            except ValueError as e:
+            except ValueError:
                 print("Not a pandas object")
 
     def methods(self):
@@ -95,3 +105,7 @@ class SharedState:
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.shared_state.clean_up()
+
+
+if __name__ == "__main__":
+    SharedState()

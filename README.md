@@ -30,3 +30,10 @@ class Test:
 >>> print(ss["name"])
 "new name"
 ```
+Gracefully handles keyboard or explicit exit:
+```python
+>>> s = SharedState()
+>>> exit()
+Destroyed shared resources
+Killed all child processes
+```

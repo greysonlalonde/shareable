@@ -4,9 +4,7 @@ from multiprocessing.connection import Client, Listener
 from multiprocessing.managers import SharedMemoryManager
 from abc import ABC, abstractmethod
 import psutil
-import atexit
 import time
-import asyncio
 import pickle
 import os
 
@@ -69,10 +67,11 @@ class AbstractShared(ABC):
             while x == 0:
                 if func:
                     if args:
+                        x = 1
                         result = func(message)
                     else:
                         result = func()
-                    x = 1
+
                     print(f"Function: {func}")
                     return result
                 else:
@@ -149,10 +148,8 @@ class SimpleSharedOne(AbstractShared):
         SimpleSharedOne.pid = self.pid
         SimpleSharedOne.obj = self.obj
         self._unpickled = pickle.loads(self.shared_obj[-1])
-        asyncio.create_task(self.listen())
 
     @staticmethod
-    @atexit.register
     def clean_up_one():
         """atexit was double registering, need to find a workaround for this"""
         SimpleSharedOne.clean_up()
@@ -206,12 +203,6 @@ class SimpleSharedTwo(AbstractShared):
         SimpleSharedTwo.obj = self.obj
         self.process_ids[0] = self.pid
         self._unpickled = pickle.loads(self.shared_obj[-1])
-
-    @staticmethod
-    @atexit.register
-    def clean_up_two():
-        """atexit was double registering, need to find a workaround for this"""
-        SimpleSharedTwo.clean_up()
 
     @staticmethod
     def clean_up():
@@ -281,3 +272,7 @@ class SharedStateCreator:
             factory = ComplexProducer()
 
         return factory
+
+
+if __name__ == "__main__":
+    pass
