@@ -142,8 +142,6 @@ class AbstractShared(ABC):
 class SimpleSharedOne(AbstractShared):
     def __init__(self, obj):
         self.obj = obj
-        self.rec_queue = []
-        self.sent_queue = []
 
     def start(self):
         self.shared_obj = ShareableList([self.pickled], name="SharedState")
@@ -164,8 +162,6 @@ class SimpleSharedOne(AbstractShared):
 class SimpleSharedTwo(AbstractShared):
     def __init__(self, obj=None):
         self.obj = obj
-        self.rec_queue = []
-        self.sent_queue = []
 
     def start(self):
         self.shared_obj = ShareableList(name="SharedState")
