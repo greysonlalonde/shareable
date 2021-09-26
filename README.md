@@ -23,12 +23,12 @@ class Test:
 # in terminal 2: 
 >>> from shared_state import SharedState
 >>> ss = SharedState()
->>> print(ss["name"])
+>>> ss["name"]
 "DB Cooper"
 >>> ss["name"] = "new name"
 
 # back in terminal 1:
->>> print(ss["name"])
+>>> ss["name"]
 "new name"
 >> ss 
 {"name": "new name", "age", 50}
