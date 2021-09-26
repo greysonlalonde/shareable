@@ -52,11 +52,13 @@ class ComplexProducer(AbstractProducer):
 
 
 class AbstractShared(ABC):
-    shared_obj = None
-    process_ids = None
     resource_tracker = None
-    pid = os.getpid()
+    process_ids = None
+    shared_obj = None
     obj = None
+    pid = os.getpid()
+    sent_queue = []
+    rec_queue = []
     addr = ("localhost", 6000)
     secret = bytes("secret".encode("utf-8"))
 
@@ -67,7 +69,6 @@ class AbstractShared(ABC):
             while x == 0:
                 if func:
                     if args:
-                        x = 1
                         result = func(message)
                     else:
                         result = func()
