@@ -67,7 +67,10 @@ class AbstractShared(ABC):
 
     @classmethod
     def clean_up(cls):
+        print(cls)
+
         cls.shared_obj.shm.close()
+
         cls.process_ids.shm.close()
         if not isinstance(cls.obj, type(None)):
             cls.shared_obj.shm.unlink()
@@ -119,8 +122,9 @@ class AbstractShared(ABC):
 
 
 class SimpleSharedOne(AbstractShared):
-    def __init__(self, obj):
+    def __init__(self, obj, settings=False):
         self.obj = obj
+        self.settings = settings
         self.shareable = self.pickled
 
     def start(self):
@@ -139,8 +143,9 @@ class SimpleSharedOne(AbstractShared):
 
 
 class SimpleSharedTwo(AbstractShared):
-    def __init__(self, obj=None):
+    def __init__(self, obj=None, settings=False):
         self.obj = obj
+        self.settings = settings
 
     def start(self):
         self.shared_obj = ShareableList(name="SharedState")
@@ -158,17 +163,20 @@ class SimpleSharedTwo(AbstractShared):
 
 
 class ComplexSharedOne(AbstractShared):
-    smm = SharedMemoryManager()
+    shm = SharedMemoryManager()
 
     def __init__(self, obj, settings=True):
         self.settings = settings
         self.obj = obj
-        self.smm = ComplexSharedOne.smm
+        self.shm = ComplexSharedOne.shm
+
 
     def start(self):
-        self.smm.start()
-        self.process_ids = self.smm.ShareableList([self.pid])
-        self.shared_obj = self.smm.ShareableList([self.pickled])
+        self.shm.start()
+        self.process_ids = self.shm.ShareableList([self.pid])
+        self.shared_obj = self.shm.ShareableList([self.pickled])
+        ComplexSharedOne.process_ids = self.process_ids
+        ComplexSharedTwo.shared_obj = self.shared_obj
         self.process_ids[0] = self.pid
         x = 0
         while x == 0:
@@ -176,23 +184,24 @@ class ComplexSharedOne(AbstractShared):
                 self.send(self.shared_obj.shm.name)
                 x = 1
             except ConnectionRefusedError:
-                print("Shared instance not found\nTrying again in 5 seconds")
                 time.sleep(5)
 
 
 class ComplexSharedTwo(AbstractShared):
-    smm = SharedMemoryManager()
+    shm = SharedMemoryManager()
 
     def __init__(self, obj=None, settings=True):
         self.settings = settings
         self.obj = obj
-        self.smm = ComplexSharedTwo.smm
+        self.shm = ComplexSharedTwo.shm
 
     def start(self):
         self.listen()
         name = self.rec_queue[0]
         self.process_ids = ShareableList([self.pid])
         self.shared_obj = ShareableList(name=name)
+        ComplexSharedTwo.process_ids = self.process_ids
+        ComplexSharedTwo.shared_obj =self.shared_obj
         self.process_ids[0] = self.pid
 
 
