@@ -1,8 +1,8 @@
 shared-state
 ===========================
  Dynamic python object access & manipulation across threads/processes
- (This package is not close to being usable)
 ---
+ (This package is not close to being usable)
   
 Example:
 ```python
