@@ -1,12 +1,12 @@
 from multiprocessing.resource_tracker import ResourceTracker
 from multiprocessing.shared_memory import ShareableList
-from multiprocessing.connection import Client, Listener
 from multiprocessing.managers import SharedMemoryManager
 from shared_state.managers_decorators import Resources
+from multiprocessing.connection import Client
 from abc import ABC, abstractmethod
 import psutil
-import time
 import pickle
+import time
 import os
 
 
@@ -48,16 +48,11 @@ class AbstractShared(ABC):
     secret = bytes("secret".encode("utf-8"))
 
     def listen(self, func=None, args=None):
-        listener = Listener(self.addr, authkey=self.secret)
-        with Resources(listener) as message:
+        with Resources(self.addr, authkey=self.secret) as message:
             x = 0
             while x == 0:
-                if func:
-                    if args:
-                        result = func(message)
-                    else:
-                        result = func()
-
+                if func or args:
+                    result = func(message)
                     print(f"Function: {func}")
                     return result
                 else:
@@ -68,7 +63,6 @@ class AbstractShared(ABC):
     def send(self, value):
         with Client(self.addr, authkey=self.secret) as conn:
             conn.send(value)
-            conn.send("close")
         self.sent_queue.append(value)
 
     @classmethod
@@ -113,7 +107,7 @@ class AbstractShared(ABC):
 
     def __str__(self):
         if not self.shared_obj:
-            return "Shared object does not exit"
+            return "Shared object does not exist"
         else:
             return str(pickle.loads(self.shared_obj[-1]).__dict__)
 
@@ -141,7 +135,6 @@ class SimpleSharedOne(AbstractShared):
         self.process_ids[0] = self.pid
         SimpleSharedOne.pid = self.pid
         SimpleSharedOne.obj = self.obj
-        self._unpickled = pickle.loads(self.shared_obj[-1])
 
 
 class SimpleSharedTwo(AbstractShared):
@@ -161,20 +154,21 @@ class SimpleSharedTwo(AbstractShared):
         SimpleSharedTwo.pid = self.pid
         SimpleSharedTwo.obj = self.obj
         self.process_ids[0] = self.pid
-        self._unpickled = pickle.loads(self.shared_obj[-1])
 
 
 class ComplexSharedOne(AbstractShared):
-    def __init__(self, obj):
-        super().__init__(obj)
+    smm = SharedMemoryManager()
 
-    def start(self, obj=None):
-        self.smm = SharedMemoryManager()
+    def __init__(self, obj, settings=True):
+        self.settings = settings
+        self.obj = obj
+        self.smm = ComplexSharedOne.smm
+
+    def start(self):
         self.smm.start()
         self.process_ids = self.smm.ShareableList([self.pid])
         self.shared_obj = self.smm.ShareableList([self.pickled])
         self.process_ids[0] = self.pid
-        self._unpickled = pickle.loads(self.shared_obj[-1])
         x = 0
         while x == 0:
             try:
@@ -186,16 +180,19 @@ class ComplexSharedOne(AbstractShared):
 
 
 class ComplexSharedTwo(AbstractShared):
-    def __init__(self, obj):
-        super().__init__(obj)
+    smm = SharedMemoryManager()
 
-    def start(self, obj=None):
+    def __init__(self, obj=None, settings=True):
+        self.settings = settings
+        self.obj = obj
+        self.smm = ComplexSharedTwo.smm
+
+    def start(self):
         self.listen()
         name = self.rec_queue[0]
         self.process_ids = ShareableList([self.pid])
         self.shared_obj = ShareableList(name=name)
         self.process_ids[0] = self.pid
-        self._unpickled = pickle.loads(self.shared_obj[-1])
 
 
 class SharedStateCreator:
