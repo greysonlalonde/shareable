@@ -44,11 +44,11 @@ class AbstractShared(ABC):
     pid = os.getpid()
     sent_queue = []
     rec_queue = []
-    addr = ("localhost", 6000)
-    secret = bytes("secret".encode("utf-8"))
+    ADDR = ("localhost", 6000)
+    SECRET = bytes("secret".encode("utf-8"))
 
     def listen(self, func=None, args=None):
-        with Resources(self.addr, authkey=self.secret) as message:
+        with Resources(self.ADDR, authkey=self.SECRET) as message:
             x = 0
             while x == 0:
                 if func or args:
@@ -61,7 +61,7 @@ class AbstractShared(ABC):
                     x = 1
 
     def send(self, value):
-        with Client(self.addr, authkey=self.secret) as conn:
+        with Client(self.ADDR, authkey=self.SECRET) as conn:
             conn.send(value)
         self.sent_queue.append(value)
 
@@ -121,6 +121,7 @@ class AbstractShared(ABC):
 class SimpleSharedOne(AbstractShared):
     def __init__(self, obj):
         self.obj = obj
+        self.shareable = self.pickled
 
     def start(self):
         self.shared_obj = ShareableList([self.pickled], name="SharedState")
