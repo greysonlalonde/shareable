@@ -33,6 +33,32 @@ class Test:
 >> ss 
 {"name": "new name", "age", 50}
 ```
+
+Support for complex objects:
+```python
+>>> import pandas as pd
+>>> import numpy as np
+>>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
+>>> ss = SharedState(df)
+>>> ss["info"]()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 100 entries, 0 to 99
+Data columns (total 4 columns):
+ #   Column  Non-Null Count  Dtype
+---  ------  --------------  -----
+ 0   A       100 non-null    int64
+ 1   B       100 non-null    int64
+ 2   C       100 non-null    int64
+ 3   D       100 non-null    int64
+dtypes: int64(4)
+memory usage: 3.2 KB
+
+# terminal 2:
+>>> ss = SharedState()
+>>> ss["columns"]
+Index(['A', 'B', 'C', 'D'], dtype='object')
+```
+
 Gracefully handles resources on keyboard or explicit exit:
 ```python
 >>> ss = SharedState()
