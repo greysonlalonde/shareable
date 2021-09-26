@@ -62,32 +62,23 @@ class AbstractShared(ABC):
     def start(self, obj=None):
         pass
 
-    async def await_listen(self):
-        await self.listen()
-
-    async def listen(self, func=None, args=None):
-        print(self.addr)
-        print(self.secret)
+    def listen(self, func=None, args=None):
         listener = Listener(self.addr, authkey=self.secret)
         with Resources(listener) as message:
             x = 0
-            while True:
-                print("listening")
-                while x == 0:
-                    print("listening2")
-                    if func:
-                        if args:
-                            result = func(message)
-                        else:
-                            result = func()
-                        x = 1
-                        print(f"Function: {func}")
-                        return result
+            while x == 0:
+                if func:
+                    if args:
+                        result = func(message)
                     else:
-                        print(f"Received message: {message}")
-                        self.rec_queue.append(message)
-                        x = 1
-                    await asyncio.sleep(2)
+                        result = func()
+                    x = 1
+                    print(f"Function: {func}")
+                    return result
+                else:
+                    print(f"Received message: {message}")
+                    self.rec_queue.append(message)
+                    x = 1
 
     def send(self, value):
         with Client(self.addr, authkey=self.secret) as conn:
@@ -103,24 +94,6 @@ class AbstractShared(ABC):
         b = os.urandom(1000)
         self.obj.b = b
         return pickle.dumps(self.obj)
-
-    # def clean_up(self):
-    #     self.shared_obj.shm.close()
-    #     self.process_ids.shm.close()
-    #     if not isinstance(self.obj, type(None)):
-    #         self.shared_obj.shm.unlink()
-    #         self.process_ids.shm.unlink()
-    #     self.resource_tracker.unregister('SharedState', 'shared_memory')
-    #     self.resource_tracker.unregister('ProcessId', 'shared_memory')
-    #     del self.shared_obj
-    #     del self.process_ids
-    #     print("Destroyed shared resources")
-    #
-    #     p = psutil.Process(self.pid)
-    #     for i in p.children(recursive=True):
-    #         p_temp = psutil.Process(i.pid)
-    #         p_temp.kill()
-    #     print(f"Killed all child processes")
 
     def __delitem__(self, key):
         self.__delattr__(key)
@@ -186,12 +159,9 @@ class SimpleSharedOne(AbstractShared):
 
     @staticmethod
     def clean_up():
-        print("before1:")
         SimpleSharedOne.shared_obj.shm.close()
         SimpleSharedOne.process_ids.shm.close()
-        print("after1:")
         if not isinstance(SimpleSharedOne.obj, type(None)):
-            print("unlinked")
             SimpleSharedOne.shared_obj.shm.unlink()
             SimpleSharedOne.process_ids.shm.unlink()
         SimpleSharedOne.resource_tracker.unregister("SharedState", "shared_memory")
