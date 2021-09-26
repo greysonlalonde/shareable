@@ -18,7 +18,7 @@ class Test:
 >>> s = Test("DB Cooper", 50)
 >>> ss = SharedState(s)
 >>> ss
-{'name': 'DB Cooper', 'age', 50}
+{"name": "DB Cooper", "age", 50}
 
 # in terminal 2: 
 >>> from shared_state import SharedState
@@ -31,12 +31,12 @@ class Test:
 >>> print(ss["name"])
 "new name"
 >> ss 
-{'name': 'new name', 'age', 50}
+{"name": "new name", "age", 50}
 ```
 Gracefully handles resources on keyboard or explicit exit:
 ```python
 >>> ss = SharedState()
 >>> exit()
-Destroyed shared resources
-Killed all child processes
+"Destroyed shared resources"
+"Killed all child processes""
 ```
