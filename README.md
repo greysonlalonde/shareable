@@ -8,16 +8,17 @@ Example:
 ```python
 from shared_state import SharedState
 
+# make a test class:
 class Test:
-    """test class"""
-    def __init__(self, name):
+    def __init__(self, name, age):
         self.name = name
+        self.age = age
     
 # in terminal 1
->>> s = Test("DB Cooper")
+>>> s = Test("DB Cooper", 50)
 >>> ss = SharedState(s)
->>> print(ss["name"])
-"DB Cooper"
+>>> ss
+{'name': 'DB Cooper', 'age', 50}
 
 # in terminal 2: 
 >>> from shared_state import SharedState
@@ -29,10 +30,12 @@ class Test:
 # back in terminal 1:
 >>> print(ss["name"])
 "new name"
+>> ss 
+{'name': 'new name', 'age', 50}
 ```
-Gracefully handles keyboard or explicit exit:
+Gracefully handles resources on keyboard or explicit exit:
 ```python
->>> s = SharedState()
+>>> ss = SharedState()
 >>> exit()
 Destroyed shared resources
 Killed all child processes
