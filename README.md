@@ -15,6 +15,7 @@ class Test:
         self.age = age
     
 # in terminal 1
+>>> from shared_state import SharedState
 >>> s = Test("DB Cooper", 50)
 >>> ss = SharedState(s)
 >>> ss
