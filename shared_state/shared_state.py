@@ -5,18 +5,17 @@ import pickle
 
 @on_start
 class SharedState:
+
     def __init__(self, obj=None, comm_state=None):
         self.obj = obj
         factory = SharedStateCreator.get_factory(comm_state)
-        if not isinstance(obj, type(None)) and not comm_state:
-            self.shared_state = factory.shared_state_a(obj)
-        elif isinstance(obj, type(None)) and not comm_state:
-            self.shared_state = factory.shared_state_b(obj)
 
-        elif not isinstance(obj, type(None)) and comm_state:
+        if not isinstance(obj, type(None)):
             self.shared_state = factory.shared_state_a(obj)
-        else:
+        elif isinstance(obj, type(None)):
             self.shared_state = factory.shared_state_b(obj)
+        else:
+            raise Warning
 
     def run(self):
         self.shared_state.start()
@@ -25,7 +24,7 @@ class SharedState:
                 self.pop("b")
             # for pandas objects
             except AttributeError:
-                print("This is  a pandas object")
+                print("Connection established")
 
     def methods(self):
         method_list = [
@@ -76,9 +75,6 @@ class SharedState:
 
     def __enter__(self):
         return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.shared_state.clean_up()
 
 
 if __name__ == "__main__":
