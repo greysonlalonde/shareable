@@ -6,8 +6,6 @@ import psutil
 
 
 def on_start(cls):
-    print("done")
-
     @wraps(cls)
     def inner(self=None, *method_args, **method_kwargs):
         method = None
@@ -15,10 +13,8 @@ def on_start(cls):
             if k == "run":
                 try:
                     method = cls(self, *method_args, **method_kwargs)
-                    print(method.shared_state.__dict__)
                     method.run()
                     atexit.register(method.shared_state.clean_up)
-
                 except FileNotFoundError:
                     print("Shared object space has not been allocated")
                     break
