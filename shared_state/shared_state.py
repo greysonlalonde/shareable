@@ -24,8 +24,8 @@ class SharedState:
             try:
                 self.pop("b")
             # for pandas objects
-            except ValueError:
-                print("Not a pandas object")
+            except AttributeError:
+                print("This is  a pandas object")
 
     def methods(self):
         method_list = [
@@ -60,13 +60,19 @@ class SharedState:
         if not self.shared_state.shared_obj:
             return "Shared object does not exist"
         else:
-            return str(pickle.loads(self.shared_state.shared_obj[-1]).__dict__)
+            if self.shared_state.settings:
+                return str(pickle.loads(self.shared_state.shared_obj[-1]))
+            else:
+                return str(pickle.loads(self.shared_state.shared_obj[-1]).__dict__)
 
     def __repr__(self):
         if not self.shared_state.shared_obj:
             return "Shared state does not exist"
         else:
-            return str(pickle.loads(self.shared_state.shared_obj[-1]).__dict__)
+            if self.shared_state.settings:
+                return str(pickle.loads(self.shared_state.shared_obj[-1]))
+            else:
+                return str(pickle.loads(self.shared_state.shared_obj[-1]).__dict__)
 
     def __enter__(self):
         return self
