@@ -1,26 +1,6 @@
-from .shared_objects import SharedStateCreator
-from functools import wraps
+from shared_state.shared_objects import SharedStateCreator
+from shared_state.managers_decorators import on_start
 import pickle
-import atexit
-import psutil
-
-
-def on_start(cls):
-    @wraps(cls)
-    def inner(self=None, *method_args, **method_kwargs):
-        method = None
-        for k, v in cls.__dict__.items():
-            if k == "run":
-                try:
-                    method = cls(self, *method_args, **method_kwargs)
-                    method.run()
-                    atexit.register(method.shared_state.clean_up)
-                except FileNotFoundError:
-                    print("Shared object space has not been allocated")
-                    break
-        return method
-
-    return inner
 
 
 @on_start
@@ -58,14 +38,6 @@ class SharedState:
     @property
     def shared_elements(self):
         return pickle.loads(self.shared_state.shared_obj[-1])
-
-    def get_processes(self):
-        li = []
-        p = psutil.Process(self.shared_state.pid)
-        for i in p.children(recursive=True):
-            p_temp = psutil.Process(i.pid)
-            li.append(p_temp)
-        return li
 
     def pop(self, key):
         temp = pickle.loads(self.shared_state.shared_obj[-1])

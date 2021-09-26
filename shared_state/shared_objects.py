@@ -2,27 +2,12 @@ from multiprocessing.resource_tracker import ResourceTracker
 from multiprocessing.shared_memory import ShareableList
 from multiprocessing.connection import Client, Listener
 from multiprocessing.managers import SharedMemoryManager
+from shared_state.managers_decorators import Resources
 from abc import ABC, abstractmethod
 import psutil
 import time
 import pickle
 import os
-
-
-class Resources:
-    def __init__(self, listener):
-        self.listener = listener
-        self.conn = listener.accept()
-
-    def __enter__(self):
-        try:
-            return self.conn.recv()
-        except Exception as e:
-            return e
-
-    def __exit__(self, exc_type, exc_value, exc_traceback):
-        self.listener.close()
-        self.conn.close()
 
 
 class AbstractProducer(ABC):
@@ -225,4 +210,4 @@ class SharedStateCreator:
 
 
 if __name__ == "__main__":
-    pass
+    ...
