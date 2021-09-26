@@ -1,3 +1,4 @@
+from multiprocessing.connection import Listener
 from functools import wraps
 import atexit
 
@@ -20,13 +21,14 @@ def on_start(cls):
     return inner
 
 
-class Resources:
+class Resources(Listener):
     """
     Resource manager for receiving messages between processes
     """
-    def __init__(self, listener):
-        self.listener = listener
-        self.conn = listener.accept()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.conn = self.accept()
 
     def __enter__(self):
         try:
@@ -35,8 +37,8 @@ class Resources:
             return e
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
-        self.listener.close()
         self.conn.close()
+        self.close()
 
 
 if __name__ == "__main__":
