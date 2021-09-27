@@ -17,25 +17,25 @@ class Test:
         self.age = age
 
 # in terminal 1
->> > from shareable import Shareable
->> > test = Test('DB Cooper', 50)
->> > s = Shareable(t)
->> > s
+>>> from shareable import Shareable
+>>> test = Test('DB Cooper', 50)
+>>> s = Shareable(t)
+>>> s
 {'name': 'DB Cooper', 'age', 50}
 
 # in terminal 2: 
->> > from shareable import Shareable
->> > s = Shareable()
+>>> from shareable import Shareable
+>>> s = Shareable()
 'Connection established'
->> > s['name']
+>>> s['name']
 'DB Cooper'
 >> > s['name'] = 'new name'
 
 # back in terminal 1:
 'Connection established'
->> > s['name']
+>>> s['name']
 'new name'
->> s
+>>> s
 {'name': 'new name', 'age', 50}
 ```
 
