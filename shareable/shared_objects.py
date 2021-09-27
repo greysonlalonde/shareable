@@ -1,6 +1,6 @@
 from multiprocessing.shared_memory import ShareableList
 from multiprocessing.managers import SharedMemoryManager
-from shareable.managers_decorators import Resources
+from .managers_decorators import Resources
 from multiprocessing.connection import Client
 from pandas.core.frame import DataFrame
 from abc import ABC, abstractmethod

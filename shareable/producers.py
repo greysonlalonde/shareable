@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from shareable.shared_objects import SharedOne, SharedTwo
+from .shared_objects import SharedOne, SharedTwo
 
 
 class AbstractProducer(ABC):

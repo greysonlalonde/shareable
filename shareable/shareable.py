@@ -1,5 +1,5 @@
-from shareable.producers import SimpleProducer
-from shareable.managers_decorators import on_start
+from .producers import SimpleProducer
+from .managers_decorators import on_start
 import pickle
 
 
