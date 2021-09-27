@@ -53,7 +53,9 @@ class Shareable:
         if not self.shared_state.shared_obj:
             return "Shared state does not exist"
         else:
-            return str(pickle.loads(self.shared_state.shared_obj[-1]))
+            obj = pickle.loads(self.shared_state.shared_obj[-1])
+            obj_repr = f"Shareable({', '.join([str(v) for v in obj.__dict__.values()])})"
+            return obj_repr
 
     def __enter__(self):
         return self
