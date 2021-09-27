@@ -25,14 +25,18 @@ class Test:
 >>> from shared_state import SharedState
 >>> ss = SharedState()
 'Connection established'
+
 >>> ss['name']
 'DB Cooper'
+
 >>> ss['name'] = 'new name'
 
 # back in terminal 1:
 'Connection established'
+
 >>> ss['name']
 'new name'
+
 >> ss 
 {'name': 'new name', 'age', 50}
 ```
@@ -58,7 +62,8 @@ memory usage: 3.2 KB
 
 # terminal 2:
 >>> ss = SharedState()
-Connection established
+'Connection established'
+
 >>> ss['columns']
 Index(['A', 'B', 'C', 'D'], dtype='object')
 ```
