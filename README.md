@@ -16,25 +16,25 @@ class Test:
     
 # in terminal 1
 >>> from shared_state import SharedState
->>> s = Test("DB Cooper", 50)
+>>> s = Test('DB Cooper', 50)
 >>> ss = SharedState(s)
 >>> ss
-{"name": "DB Cooper", "age", 50}
+{'name': 'DB Cooper', 'age', 50}
 
 # in terminal 2: 
 >>> from shared_state import SharedState
 >>> ss = SharedState()
-Connection established
->>> ss["name"]
-"DB Cooper"
->>> ss["name"] = "new name"
+'Connection established'
+>>> ss['name']
+'DB Cooper'
+>>> ss['name'] = 'new name'
 
 # back in terminal 1:
-Connection established
->>> ss["name"]
-"new name"
+'Connection established'
+>>> ss['name']
+'new name'
 >> ss 
-{"name": "new name", "age", 50}
+{'name': 'new name', 'age', 50}
 ```
 
 Support for complex objects:
@@ -43,7 +43,7 @@ Support for complex objects:
 >>> import numpy as np
 >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
 >>> ss = SharedState(df)
->>> ss["info"]()
+>>> ss['info']()
 <class 'pandas.core.frame.DataFrame'>
 RangeIndex: 100 entries, 0 to 99
 Data columns (total 4 columns):
@@ -59,7 +59,7 @@ memory usage: 3.2 KB
 # terminal 2:
 >>> ss = SharedState()
 Connection established
->>> ss["columns"]
+>>> ss['columns']
 Index(['A', 'B', 'C', 'D'], dtype='object')
 ```
 
@@ -67,6 +67,6 @@ Gracefully handles resources on keyboard or explicit exit:
 ```python
 >>> ss = SharedState()
 >>> exit()
-"Destroyed shared resources"
-"Killed all child processes""
+'Destroyed shared resources'
+'Killed all child processes'
 ```
