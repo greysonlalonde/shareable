@@ -40,6 +40,10 @@ class AbstractShared(ABC):
     ADDR = ("localhost", 6000)
     SECRET = bytes("secret".encode("utf-8"))
 
+    @abstractmethod
+    def start(self):
+        pass
+
     def listen(self, func=None, args=None):
         with Resources(self.ADDR, authkey=self.SECRET) as message:
             x = 0
@@ -66,35 +70,6 @@ class AbstractShared(ABC):
             p_temp = psutil.Process(i.pid)
             p_temp.kill()
         print("Killed all child processes")
-
-    def pop(self, key):
-        temp = pickle.loads(self.shared_obj[-1])
-        temp.__delattr__(key)
-        self.shared_obj[-1] = pickle.dumps(temp)
-
-    def __delitem__(self, key):
-        self.__delattr__(key)
-
-    def __getitem__(self, key):
-        temp = pickle.loads(self.shared_obj[-1])
-        return temp.__getattribute__(key)
-
-    def __setitem__(self, key, value):
-        temp = pickle.loads(self.shared_obj[-1])
-        temp.__setattr__(key, value)
-        self.shared_obj[-1] = pickle.dumps(temp)
-
-    def __str__(self):
-        if not self.shared_obj:
-            return "Shared object does not exist"
-        else:
-            return str(pickle.loads(self.shared_obj[-1]).__dict__)
-
-    def __repr__(self):
-        if not self.shared_obj:
-            return "Shared object does not exist"
-        else:
-            return str(pickle.loads(self.shared_obj[-1]).__dict__)
 
 
 class SharedOne(AbstractShared):
@@ -127,6 +102,11 @@ class SharedOne(AbstractShared):
         self.process_ids[0] = self.pid
         SharedOne.pid = self.pid
         SharedOne.obj = self.obj
+
+    def pop(self, key):
+        temp = pickle.loads(self.shared_obj[-1])
+        temp.__delattr__(key)
+        self.shared_obj[-1] = pickle.dumps(temp)
 
     def pickled(self):
         """manually allocate memory, I haven't looked into
