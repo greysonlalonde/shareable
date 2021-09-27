@@ -6,7 +6,7 @@ import pickle
 @on_start
 class SharedState:
 
-    def __init__(self, obj=None, comm_state=None):
+    def __init__(self, obj=None, comm_state=False):
         self.obj = obj
         factory = SharedStateCreator.get_factory(comm_state)
 

@@ -12,7 +12,19 @@ def on_start(cls):
             if k == "run":
                 try:
                     method = cls(self, *args, **kwargs)
-                    method.run()
+                    t = Thread(target=method.run)
+                    t.daemon = True
+                    t.start()
+                    atexit.register(method.shared_state.clean_up)
+                except FileNotFoundError:
+                    print("Shared object space has not been allocated")
+                    break
+            if k == "listen":
+                try:
+                    method = cls(self, *args, **kwargs)
+                    t = Thread(target=method.listen)
+                    t.daemon = True
+                    t.start()
                     atexit.register(method.shared_state.clean_up)
                 except FileNotFoundError:
                     print("Shared object space has not been allocated")

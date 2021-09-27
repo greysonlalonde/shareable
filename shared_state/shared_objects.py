@@ -56,7 +56,7 @@ class AbstractShared(ABC):
                     print(f"Function: {func}")
                     return result
                 else:
-                    print(f"Received message: {message}")
+                    print("Connection established")
                     self.rec_queue.append(message)
                     x = 1
 
@@ -67,25 +67,27 @@ class AbstractShared(ABC):
 
     @classmethod
     def clean_up(cls):
-        print(cls)
+        if cls.settings:
+            cls.shm.shutdown()
+            print("Destroyed shared resources")
+        else:
+            cls.shared_obj.shm.close()
 
-        cls.shared_obj.shm.close()
-
-        cls.process_ids.shm.close()
-        if not isinstance(cls.obj, type(None)):
-            cls.shared_obj.shm.unlink()
-            cls.process_ids.shm.unlink()
-        cls.resource_tracker.unregister("SharedState", "shared_memory")
-        cls.resource_tracker.unregister("ProcessId", "shared_memory")
-        del cls.shared_obj
-        del cls.process_ids
-        print("Destroyed shared resources")
+            cls.process_ids.shm.close()
+            if not isinstance(cls.obj, type(None)):
+                cls.shared_obj.shm.unlink()
+                cls.process_ids.shm.unlink()
+            cls.resource_tracker.unregister("SharedState", "shared_memory")
+            cls.resource_tracker.unregister("ProcessId", "shared_memory")
+            del cls.shared_obj
+            del cls.process_ids
+            print("Destroyed shared resources")
 
         p = psutil.Process(cls.pid)
         for i in p.children(recursive=True):
             p_temp = psutil.Process(i.pid)
             p_temp.kill()
-        print(f"Killed all child processes")
+        print("Killed all child processes")
 
     @property
     def pickled(self):
@@ -164,12 +166,13 @@ class SimpleSharedTwo(AbstractShared):
 
 class ComplexSharedOne(AbstractShared):
     shm = SharedMemoryManager()
+    settings = True
 
     def __init__(self, obj, settings=True):
         self.settings = settings
+        ComplexSharedOne.settings = self.settings
         self.obj = obj
         self.shm = ComplexSharedOne.shm
-
 
     def start(self):
         self.shm.start()
@@ -192,16 +195,18 @@ class ComplexSharedTwo(AbstractShared):
 
     def __init__(self, obj=None, settings=True):
         self.settings = settings
+        ComplexSharedTwo.settings = self.settings
         self.obj = obj
         self.shm = ComplexSharedTwo.shm
 
     def start(self):
+        self.shm.start()
         self.listen()
         name = self.rec_queue[0]
         self.process_ids = ShareableList([self.pid])
         self.shared_obj = ShareableList(name=name)
         ComplexSharedTwo.process_ids = self.process_ids
-        ComplexSharedTwo.shared_obj =self.shared_obj
+        ComplexSharedTwo.shared_obj = self.shared_obj
         self.process_ids[0] = self.pid
 
 
