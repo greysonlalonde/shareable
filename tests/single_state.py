@@ -1,15 +1,15 @@
-from shareable.shareable import SharedState
-from test_class import Shareable
+from shareable.shareable import Shareable
+from test_class import Test
 
 
 def main():
     """
-    >>> s = Shareable("John Smith", 10, 10)
-    >>> ss = SharedState(s)
-    >>> print(ss["name"])
+    >>> t = Test("John Smith", 10, 10)
+    >>> s = Shareable(s)
+    >>> print(s["name"])
     John Smith
-    >>> ss["name"] = "about to be deleted"
-    >>> print(ss["name"])
+    >>> s["name"] = "about to be deleted"
+    >>> print(s["name"])
     about to be deleted
     >>>
     Destroyed shared resources

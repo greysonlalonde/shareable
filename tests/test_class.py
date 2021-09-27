@@ -1,4 +1,4 @@
-class Shareable:
+class Test:
     def __init__(self, name, age, ss):
         self.name = name
         self.age = age
