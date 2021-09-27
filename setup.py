@@ -13,7 +13,7 @@ setup(
     author="Greyson R. LaLonde",
     author_email="greyson.r.lalonde@gmail.com",
     packages=find_packages(),
-    install_requires=["psutil"],
+    install_requires=["psutil", "pandas"],
     version="v0.1-alpha",
     license="MIT",
     description='Dynamic python object access & manipulation across threads/processes.',
