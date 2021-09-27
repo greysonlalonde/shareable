@@ -20,6 +20,7 @@ parts/
 sdist/
 var/
 wheels/
+.pypirc
 *.egg-info/
 .dist
 .installed.cfg
