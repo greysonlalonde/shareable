@@ -1,14 +1,13 @@
-from shared_state.shared_objects import SharedStateCreator
+from shared_state.shared_objects import SimpleProducer
 from shared_state.managers_decorators import on_start
 import pickle
 
 
 @on_start
 class SharedState:
-
-    def __init__(self, obj=None, comm_state=False):
+    def __init__(self, obj=None):
         self.obj = obj
-        factory = SharedStateCreator.get_factory(comm_state)
+        factory = SimpleProducer()
 
         if not isinstance(obj, type(None)):
             self.shared_state = factory.shared_state_a(obj)
@@ -19,12 +18,7 @@ class SharedState:
 
     def run(self):
         self.shared_state.start()
-        if not isinstance(self.obj, type(None)):
-            try:
-                self.pop("b")
-            # for pandas objects
-            except AttributeError:
-                print("Connection established")
+        print("Connection established")
 
     def methods(self):
         method_list = [
@@ -59,19 +53,13 @@ class SharedState:
         if not self.shared_state.shared_obj:
             return "Shared object does not exist"
         else:
-            if self.shared_state.settings:
-                return str(pickle.loads(self.shared_state.shared_obj[-1]))
-            else:
-                return str(pickle.loads(self.shared_state.shared_obj[-1]).__dict__)
+            return str(pickle.loads(self.shared_state.shared_obj[-1]))
 
     def __repr__(self):
         if not self.shared_state.shared_obj:
             return "Shared state does not exist"
         else:
-            if self.shared_state.settings:
-                return str(pickle.loads(self.shared_state.shared_obj[-1]))
-            else:
-                return str(pickle.loads(self.shared_state.shared_obj[-1]).__dict__)
+            return str(pickle.loads(self.shared_state.shared_obj[-1]))
 
     def __enter__(self):
         return self
