@@ -1,6 +1,6 @@
 from multiprocessing.shared_memory import ShareableList
 from multiprocessing.managers import SharedMemoryManager
-from shared_state.managers_decorators import Resources
+from shareable.managers_decorators import Resources
 from multiprocessing.connection import Client
 from pandas.core.frame import DataFrame
 from abc import ABC, abstractmethod
@@ -8,24 +8,6 @@ import psutil
 import pickle
 import time
 import os
-
-
-class AbstractProducer(ABC):
-    @abstractmethod
-    def shared_state_a(self):
-        pass
-
-    @abstractmethod
-    def shared_state_b(self):
-        pass
-
-
-class SimpleProducer(AbstractProducer):
-    def shared_state_a(self, *args):
-        return SharedOne(*args)
-
-    def shared_state_b(self, *args):
-        return SharedTwo()
 
 
 class AbstractShared(ABC):

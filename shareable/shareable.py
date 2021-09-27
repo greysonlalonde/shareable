@@ -1,10 +1,10 @@
-from shared_state.shared_objects import SimpleProducer
-from shared_state.managers_decorators import on_start
+from shareable.producers import SimpleProducer
+from shareable.managers_decorators import on_start
 import pickle
 
 
 @on_start
-class SharedState:
+class Shareable:
     def __init__(self, obj=None):
         factory = SimpleProducer()
 
@@ -60,4 +60,4 @@ class SharedState:
 
 
 if __name__ == "__main__":
-    SharedState()
+    Shareable()

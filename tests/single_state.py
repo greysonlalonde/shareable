@@ -1,4 +1,4 @@
-from shared_state.shared_state import SharedState
+from shareable.shareable import SharedState
 from test_class import Shareable
 
 
