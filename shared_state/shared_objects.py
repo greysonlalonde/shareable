@@ -95,9 +95,7 @@ class SharedOne(AbstractShared):
                 x = 1
             except ConnectionRefusedError:
                 time.sleep(5)
-        """
-        refactor to match ComplexShared classes, SharedMemoryManager is much less cumbersome
-        """
+
         self.pid = os.getpid()
         self.process_ids[0] = self.pid
         SharedOne.pid = self.pid
@@ -122,9 +120,6 @@ class SharedTwo(AbstractShared):
         self.shm = SharedTwo.shm
 
     def start(self):
-        """
-        refactor to match ComplexShared classes, SharedMemoryManager is much less cumbersome
-        """
         self.shm.start()
         self.listen()
         name = self.rec_queue[0]
