@@ -6,7 +6,6 @@ import pickle
 @on_start
 class SharedState:
     def __init__(self, obj=None):
-        self.obj = obj
         factory = SimpleProducer()
 
         if not isinstance(obj, type(None)):
@@ -31,11 +30,6 @@ class SharedState:
     @property
     def shared_elements(self):
         return pickle.loads(self.shared_state.shared_obj[-1])
-
-    def pop(self, key):
-        temp = pickle.loads(self.shared_state.shared_obj[-1])
-        temp.__delattr__(key)
-        self.shared_state.shared_obj[-1] = pickle.dumps(temp)
 
     def __delitem__(self, key):
         self.__delattr__(key)
