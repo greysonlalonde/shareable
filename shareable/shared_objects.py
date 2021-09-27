@@ -27,9 +27,7 @@ class AbstractShared(ABC):
         ]
         for attr in required_class_attrs:
             if not hasattr(cls, attr):
-                raise NotImplementedError(
-                    f'{cls} missing required {attr} attr'
-                )
+                raise NotImplementedError(f"{cls} missing required {attr} attr")
 
     @abstractmethod
     def start(self):
