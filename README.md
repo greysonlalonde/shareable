@@ -2,7 +2,7 @@ shared-state
 ===========================
  Dynamic python object access & manipulation across threads/processes
 ---
- (This package is not close to being usable)
+ (This package is not close to being usable, though the examples below will work)
   
 Example:
 ```python
@@ -24,11 +24,13 @@ class Test:
 # in terminal 2: 
 >>> from shared_state import SharedState
 >>> ss = SharedState()
+Connection established
 >>> ss["name"]
 "DB Cooper"
 >>> ss["name"] = "new name"
 
 # back in terminal 1:
+Connection established
 >>> ss["name"]
 "new name"
 >> ss 
@@ -56,6 +58,7 @@ memory usage: 3.2 KB
 
 # terminal 2:
 >>> ss = SharedState()
+Connection established
 >>> ss["columns"]
 Index(['A', 'B', 'C', 'D'], dtype='object')
 ```
