@@ -31,7 +31,7 @@ class Test:
 'Connection established'
 >>> s['name']
 'DB Cooper'
->> > s['name'] = 'new name'
+>>> s['name'] = 'new name'
 
 # back in terminal 1:
 'Connection established'
