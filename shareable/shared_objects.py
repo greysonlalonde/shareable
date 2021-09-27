@@ -11,6 +11,45 @@ import os
 
 
 class AbstractShared(ABC):
+    @classmethod
+    def __init_subclass__(cls):
+        required_class_attrs = [
+            "shm",
+            "resource_tracker",
+            "process_ids",
+            "shared_obj",
+            "obj",
+            "pid",
+            "sent_queue",
+            "rec_queue",
+            "ADDR",
+            "SECRET",
+        ]
+        for attr in required_class_attrs:
+            if not hasattr(cls, attr):
+                raise NotImplementedError(
+                    f'Class {cls} lacks required `{attr}` class attribute'
+                )
+
+    @abstractmethod
+    def start(self):
+        pass
+
+    @abstractmethod
+    def listen(self):
+        pass
+
+    @abstractmethod
+    def send(self, value):
+        pass
+
+    @classmethod
+    @abstractmethod
+    def clean_up(cls):
+        pass
+
+
+class Shared(AbstractShared):
     shm = SharedMemoryManager()
     resource_tracker = None
     process_ids = None
@@ -22,7 +61,6 @@ class AbstractShared(ABC):
     ADDR = ("localhost", 6000)
     SECRET = bytes("secret".encode("utf-8"))
 
-    @abstractmethod
     def start(self):
         pass
 
@@ -54,7 +92,7 @@ class AbstractShared(ABC):
         print("Killed all child processes")
 
 
-class SharedOne(AbstractShared):
+class SharedOne(Shared):
     def __init__(self, obj):
         self.obj = obj
         self.shareable = self.pickled()
@@ -97,7 +135,7 @@ class SharedOne(AbstractShared):
         return pickle.dumps(self.obj)
 
 
-class SharedTwo(AbstractShared):
+class SharedTwo(Shared):
     def __init__(self):
         self.shm = SharedTwo.shm
 
