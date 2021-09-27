@@ -9,20 +9,10 @@ def on_start(cls):
     def inner(self=None, *args, **kwargs):
         method = None
         for k, v in cls.__dict__.items():
-            if k == "run":
+            if k == "run" or k == "listen":
                 try:
                     method = cls(self, *args, **kwargs)
-                    t = Thread(target=method.run)
-                    t.daemon = True
-                    t.start()
-                    atexit.register(method.shared_state.clean_up)
-                except FileNotFoundError:
-                    print("Shared object space has not been allocated")
-                    break
-            if k == "listen":
-                try:
-                    method = cls(self, *args, **kwargs)
-                    t = Thread(target=method.listen)
+                    t = Thread(target=getattr(method, k))
                     t.daemon = True
                     t.start()
                     atexit.register(method.shared_state.clean_up)
