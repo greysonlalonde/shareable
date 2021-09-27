@@ -15,7 +15,6 @@ class AbstractShared(ABC):
     def __init_subclass__(cls):
         required_class_attrs = [
             "shm",
-            "resource_tracker",
             "process_ids",
             "shared_obj",
             "obj",
@@ -49,7 +48,6 @@ class AbstractShared(ABC):
 
 class Shared(AbstractShared):
     shm = SharedMemoryManager()
-    resource_tracker = None
     process_ids = None
     shared_obj = None
     obj = None
@@ -102,7 +100,7 @@ class SharedOne(Shared):
         self.process_ids = self.shm.ShareableList([self.pid])
         self.shared_obj = self.shm.ShareableList([self.pickled()])
         if not isinstance(self.obj, DataFrame):
-            self.pop("b")
+            self.pop("temp_space")
         SharedOne.process_ids = self.process_ids
         SharedOne.shared_obj = self.shared_obj
         self.process_ids[0] = self.pid
@@ -128,8 +126,8 @@ class SharedOne(Shared):
         """manually allocate memory, I haven't looked into
         whether there is support for 'size=num' for shared_memory
         """
-        b = os.urandom(1000)
-        self.obj.b = b
+        temp_space = os.urandom(1000)
+        self.obj.temp_space = temp_space
         return pickle.dumps(self.obj)
 
 
