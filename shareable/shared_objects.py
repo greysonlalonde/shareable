@@ -4,6 +4,7 @@ from .managers_decorators import Resources
 from multiprocessing.connection import Client
 from pandas.core.frame import DataFrame
 from abc import ABC, abstractmethod
+from pickletools import optimize
 import psutil
 import pickle
 import time
@@ -11,11 +12,11 @@ import os
 
 
 class AbstractShared(ABC):
+
     @classmethod
     def __init_subclass__(cls):
         required_class_attrs = [
             "shm",
-            "process_ids",
             "shared_obj",
             "obj",
             "pid",
@@ -47,10 +48,9 @@ class AbstractShared(ABC):
 
 
 class Shared(AbstractShared):
-    shm = SharedMemoryManager()
-    process_ids = None
     shared_obj = None
     obj = None
+    shm = SharedMemoryManager()
     pid = os.getpid()
     sent_queue = []
     rec_queue = []
@@ -97,13 +97,10 @@ class SharedOne(Shared):
 
     def start(self):
         self.shm.start()
-        self.process_ids = self.shm.ShareableList([self.pid])
         self.shared_obj = self.shm.ShareableList([self.pickled()])
         if not isinstance(self.obj, DataFrame):
             self.pop("temp_space")
-        SharedOne.process_ids = self.process_ids
         SharedOne.shared_obj = self.shared_obj
-        self.process_ids[0] = self.pid
         x = 0
         while x == 0:
             try:
@@ -113,7 +110,6 @@ class SharedOne(Shared):
                 time.sleep(5)
 
         self.pid = os.getpid()
-        self.process_ids[0] = self.pid
         SharedOne.pid = self.pid
         SharedOne.obj = self.obj
 
@@ -128,7 +124,7 @@ class SharedOne(Shared):
         """
         temp_space = os.urandom(1000)
         self.obj.temp_space = temp_space
-        return pickle.dumps(self.obj)
+        return optimize(pickle.dumps(self.obj))
 
 
 class SharedTwo(Shared):
@@ -139,11 +135,8 @@ class SharedTwo(Shared):
         self.shm.start()
         self.listen()
         name = self.rec_queue[0]
-        self.process_ids = ShareableList([self.pid])
         self.shared_obj = ShareableList(name=name)
-        SharedTwo.process_ids = self.process_ids
         SharedTwo.shared_obj = self.shared_obj
-        self.process_ids[0] = self.pid
 
 
 if __name__ == "__main__":
