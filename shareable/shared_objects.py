@@ -116,7 +116,7 @@ class SharedOne(Shared):
     def pop(self, key):
         temp = pickle.loads(self.shared_obj[-1])
         temp.__delattr__(key)
-        self.shared_obj[-1] = pickle.dumps(temp)
+        self.shared_obj[-1] = optimize(pickle.dumps(temp))
 
     def pickled(self):
         """manually allocate memory, I haven't looked into
