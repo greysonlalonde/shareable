@@ -4,41 +4,44 @@ shareable
  
 Dynamic python object access & manipulation across threads/processes
 ---
- (This package is not close to being usable, though the examples below will work)
+Installation:
+```commandline
+pip install shareable
+```
   
 Example:
 
 ```python
-from shareable import Shareable
-
-
 # make a test class:
 class Test:
     def __init__(self, name, age):
         self.name = name
         self.age = age
+        
+    def get_details(self):
+        return self.name, self.age
 
 # in terminal 1
 >>> from shareable import Shareable
 >>> test = Test('DB Cooper', 50)
->>> s = Shareable(t)
+>>> s = Shareable(test)
 >>> s
-{'name': 'DB Cooper', 'age', 50}
+'Shareable(DB Cooper, 50)'
 
 # in terminal 2: 
 >>> from shareable import Shareable
 >>> s = Shareable()
 'Connection established'
->>> s['name']
+>>> print(s['name'])
 'DB Cooper'
 >>> s['name'] = 'new name'
 
 # back in terminal 1:
 'Connection established'
->>> s['name']
+>>> print(s['name'])
 'new name'
->>> s
-{'name': 'new name', 'age', 50}
+>>> print(s.methods())
+'["age", "get_details", "name"]'
 ```
 
 Support for complex objects:
