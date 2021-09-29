@@ -1,8 +1,8 @@
 class Test:
-    def __init__(self, name, age, ss):
+    def __init__(self, name, age, s):
         self.name = name
         self.age = age
-        self.ss = ss
+        self.s = s
 
     def get_details(self):
         return self.name, self.age
