@@ -26,7 +26,6 @@ class AbstractShared(ABC):
         required_class_attrs = [
             "shm",
             "shared_obj",
-            "obj",
             "pid",
             "sent_queue",
             "rec_queue",
@@ -66,9 +65,8 @@ class AbstractShared(ABC):
         """
         raise NotImplementedError
 
-    @classmethod
     @abstractmethod
-    def clean_up(cls):
+    def clean_up(self):
         """
         Cleans up threads and shared memory process on exit
         :return:
@@ -81,7 +79,6 @@ class Shared(AbstractShared):
     """parent shared object"""
 
     shared_obj = None
-    obj = None
     shm = SharedMemoryManager()
     pid = os.getpid()
     sent_queue = []
@@ -121,16 +118,15 @@ class Shared(AbstractShared):
             conn.send(value)
         self.sent_queue.append(value)
 
-    @classmethod
-    def clean_up(cls):
+    def clean_up(self):
         """
         Cleans up threads and shared memory process on exit
         :return:
             None
         """
-        cls.shm.shutdown()
+        self.shm.shutdown()
         print("Destroyed shared resources")
-        process = psutil.Process(cls.pid)
+        process = psutil.Process(self.pid)
         for i in process.children(recursive=True):
             p_temp = psutil.Process(i.pid)
             p_temp.kill()
@@ -143,8 +139,6 @@ class SharedOne(Shared):
     def __init__(self, obj):
         self.obj = obj
         self.shareable = self.pickled()
-        SharedOne.obj = self.obj
-        self.shm = SharedOne.shm
 
     def start(self):
         """
@@ -156,7 +150,6 @@ class SharedOne(Shared):
         self.shared_obj = self.shm.ShareableList([self.pickled()])
         if not isinstance(self.obj, DataFrame):
             self.pop("temp_space")
-        SharedOne.shared_obj = self.shared_obj
         iteration = 0
         while iteration == 0:
             try:
@@ -166,8 +159,6 @@ class SharedOne(Shared):
                 time.sleep(5)
 
         self.pid = os.getpid()
-        SharedOne.pid = self.pid
-        SharedOne.obj = self.obj
 
     def pop(self, key):
         """custom method to set shared memory obj attrs"""
@@ -187,9 +178,6 @@ class SharedOne(Shared):
 class SharedTwo(Shared):
     """shared object child, listens for shared mem process"""
 
-    def __init__(self):
-        self.shm = SharedTwo.shm
-
     def start(self):
         """
         Starts a shared memory instance
@@ -200,7 +188,6 @@ class SharedTwo(Shared):
         self.listen()
         name = self.rec_queue[0]
         self.shared_obj = ShareableList(name=name)
-        SharedTwo.shared_obj = self.shared_obj
 
 
 if __name__ == "__main__":
