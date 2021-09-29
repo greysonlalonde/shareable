@@ -4,6 +4,9 @@ class Test:
         self.age = age
         self.ss = ss
 
+    def get_details(self):
+        return self.name, self.age
+
     def __str__(self):
         return str(self.__dict__)
 
