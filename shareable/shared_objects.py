@@ -75,24 +75,15 @@ class AbstractShared(ABC):
         raise NotImplementedError
 
 
-class Shared(AbstractShared):
+class Shared:
     """parent shared object"""
 
-    shared_obj = None
-    shm = SharedMemoryManager()
-    pid = os.getpid()
-    sent_queue = []
-    rec_queue = []
     ADDR = ("localhost", 6000)
     SECRET = bytes("secret".encode("utf-8"))
-
-    def start(self):
-        """
-        Starts a shared memory instance
-        :return:
-            self
-        """
-        ...
+    shm = None
+    sent_queue = []
+    rec_queue = []
+    pid = os.getpid()
 
     def listen(self):
         """
@@ -139,6 +130,9 @@ class SharedOne(Shared):
     def __init__(self, obj):
         self.obj = obj
         self.shareable = self.pickled()
+        self.pid = os.getpid()
+        self.shm = SharedMemoryManager()
+        self.shared_obj = None
 
     def start(self):
         """
@@ -158,8 +152,6 @@ class SharedOne(Shared):
             except ConnectionRefusedError:
                 time.sleep(5)
 
-        self.pid = os.getpid()
-
     def pop(self, key):
         """custom method to set shared memory obj attrs"""
         temp = pickle.loads(self.shared_obj[-1])
@@ -177,6 +169,9 @@ class SharedOne(Shared):
 
 class SharedTwo(Shared):
     """shared object child, listens for shared mem process"""
+    def __init__(self):
+        self.shared_obj = None
+        self.shm = SharedMemoryManager()
 
     def start(self):
         """
