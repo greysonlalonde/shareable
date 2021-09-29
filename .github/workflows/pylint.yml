@@ -20,3 +20,4 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         pylint shareable/ tests/
+        pylint  --exit-zero
