@@ -1,9 +1,8 @@
-from shareable.shareable import Shareable
-from test_class import Test
-
 
 def main():
     """
+    >>> from tests.test_class import Test
+    >>> from shareable.shareable import Shareable
     >>> t = Test("John Smith", 10, 10)
     >>> s = Shareable(s)
     >>> print(s["name"])

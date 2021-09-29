@@ -1,17 +1,25 @@
+"""
+SharedOne
+---------
+
+SharedTwo
+---------
+"""
 from multiprocessing.shared_memory import ShareableList
 from multiprocessing.managers import SharedMemoryManager
-from .managers_decorators import Resources
 from multiprocessing.connection import Client
-from pandas.core.frame import DataFrame
 from abc import ABC, abstractmethod
 from pickletools import optimize
-import psutil
 import pickle
 import time
 import os
+import psutil
+from pandas.core.frame import DataFrame
+from .managers_decorators import Resources
 
 
 class AbstractShared(ABC):
+    """abstraction of shared objects"""
 
     @classmethod
     def __init_subclass__(cls):
@@ -31,23 +39,47 @@ class AbstractShared(ABC):
 
     @abstractmethod
     def start(self):
-        pass
+        """
+        Starts a shared memory instance
+        :return:
+            self
+        """
+        raise NotImplementedError
 
     @abstractmethod
     def listen(self):
-        pass
+        """
+        Starts a listener for a second shared memory instance
+        :return:
+            self
+        """
+        raise NotImplementedError
 
     @abstractmethod
     def send(self, value):
-        pass
+        """
+        Sends a message holding the shared memory process name
+        :param value:
+            shared_memory name
+        :return:
+            self
+        """
+        raise NotImplementedError
 
     @classmethod
     @abstractmethod
     def clean_up(cls):
-        pass
+        """
+        Cleans up threads and shared memory process on exit
+        :return:
+            None
+        """
+        raise NotImplementedError
 
 
 class Shared(AbstractShared):
+    """parent shared object"""
+
     shared_obj = None
     obj = None
     shm = SharedMemoryManager()
@@ -58,37 +90,56 @@ class Shared(AbstractShared):
     SECRET = bytes("secret".encode("utf-8"))
 
     def start(self):
-        pass
+        """
+        Starts a shared memory instance
+        :return:
+            self
+        """
+        ...
 
-    def listen(self, func=None, args=None):
+    def listen(self):
+        """
+        Starts a listener for a second shared memory instance
+        :return:
+            self
+        """
         with Resources(self.ADDR, authkey=self.SECRET) as message:
-            x = 0
-            while x == 0:
-                if func or args:
-                    result = func(message)
-                    print(f"Function: {func}")
-                    return result
-                else:
-                    self.rec_queue.append(message)
-                    x = 1
+            counter = 0
+            while counter == 0:
+                self.rec_queue.append(message)
+                counter = 1
 
     def send(self, value):
+        """
+        Sends a message holding the shared memory process name
+        :param value:
+            shared_memory name
+        :return:
+            self
+        """
         with Client(self.ADDR, authkey=self.SECRET) as conn:
             conn.send(value)
         self.sent_queue.append(value)
 
     @classmethod
     def clean_up(cls):
+        """
+        Cleans up threads and shared memory process on exit
+        :return:
+            None
+        """
         cls.shm.shutdown()
         print("Destroyed shared resources")
-        p = psutil.Process(cls.pid)
-        for i in p.children(recursive=True):
+        process = psutil.Process(cls.pid)
+        for i in process.children(recursive=True):
             p_temp = psutil.Process(i.pid)
             p_temp.kill()
         print("Killed all child processes")
 
 
 class SharedOne(Shared):
+    """shared object child, starts shared mem process"""
+
     def __init__(self, obj):
         self.obj = obj
         self.shareable = self.pickled()
@@ -96,16 +147,21 @@ class SharedOne(Shared):
         self.shm = SharedOne.shm
 
     def start(self):
+        """
+        Starts a shared memory instance
+        :return:
+            self
+        """
         self.shm.start()
         self.shared_obj = self.shm.ShareableList([self.pickled()])
         if not isinstance(self.obj, DataFrame):
             self.pop("temp_space")
         SharedOne.shared_obj = self.shared_obj
-        x = 0
-        while x == 0:
+        iteration = 0
+        while iteration == 0:
             try:
                 self.send(self.shared_obj.shm.name)
-                x = 1
+                iteration = 1
             except ConnectionRefusedError:
                 time.sleep(5)
 
@@ -114,6 +170,7 @@ class SharedOne(Shared):
         SharedOne.obj = self.obj
 
     def pop(self, key):
+        """custom method to set shared memory obj attrs"""
         temp = pickle.loads(self.shared_obj[-1])
         temp.__delattr__(key)
         self.shared_obj[-1] = optimize(pickle.dumps(temp))
@@ -128,10 +185,17 @@ class SharedOne(Shared):
 
 
 class SharedTwo(Shared):
+    """shared object child, listens for shared mem process"""
+
     def __init__(self):
         self.shm = SharedTwo.shm
 
     def start(self):
+        """
+        Starts a shared memory instance
+        :return:
+            self
+        """
         self.shm.start()
         self.listen()
         name = self.rec_queue[0]

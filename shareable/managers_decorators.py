@@ -1,3 +1,10 @@
+"""
+on_start
+---------
+
+Resources
+---------
+"""
 from multiprocessing.connection import Listener
 from threading import Thread
 from functools import wraps
@@ -5,16 +12,18 @@ import atexit
 
 
 def on_start(cls):
+    """starts shared_memory multiprocessing instance & run methods"""
+
     @wraps(cls)
-    def inner(self=None, *args, **kwargs):
+    def inner(*args, **kwargs):
         method = None
-        for k, v in cls.__dict__.items():
-            if k == "run" or k == "listen":
+        for key in cls.__dict__.keys():
+            if key == "run":
                 try:
-                    method = cls(self, *args, **kwargs)
-                    t = Thread(target=getattr(method, k))
-                    t.daemon = True
-                    t.start()
+                    method = cls(*args, **kwargs)
+                    thread = Thread(target=getattr(method, key))
+                    thread.daemon = True
+                    thread.start()
                     atexit.register(method.shared_state.clean_up)
                 except FileNotFoundError:
                     print("Shared object space has not been allocated")
@@ -34,10 +43,7 @@ class Resources(Listener):
         self.conn = self.accept()
 
     def __enter__(self):
-        try:
-            return self.conn.recv()
-        except Exception as e:
-            return e
+        return self.conn.recv()
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
         self.conn.close()
