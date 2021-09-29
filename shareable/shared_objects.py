@@ -75,15 +75,19 @@ class AbstractShared(ABC):
         raise NotImplementedError
 
 
-class Shared:
+class Shared(AbstractShared):
     """parent shared object"""
 
     ADDR = ("localhost", 6000)
     SECRET = bytes("secret".encode("utf-8"))
     shm = None
+    shared_obj = None
     sent_queue = []
     rec_queue = []
     pid = os.getpid()
+
+    def start(self):
+        pass
 
     def listen(self):
         """
