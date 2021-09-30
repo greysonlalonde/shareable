@@ -19,4 +19,4 @@ jobs:
         pip install pylint pandas psutil
     - name: Analysing the code with pylint
       run: |
-        pylint --fail-under=8 shareable/ tests/
+        pylint --fail-under=9 shareable/ tests/
