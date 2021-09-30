@@ -5,6 +5,7 @@ shareable
 Dynamic python object access & manipulation across threads/processes
 ---
 Installation:
+requires python3.8+
 ```commandline
 pip install shareable
 ```
