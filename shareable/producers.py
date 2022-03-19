@@ -3,7 +3,7 @@ SimpleProducer
 ---------
 """
 from abc import ABC, abstractmethod
-from .shared_objects import SharedOne, SharedTwo
+from shareable.shared_objects import SharedOne, SharedTwo
 
 
 class AbstractProducer(ABC):

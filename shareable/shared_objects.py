@@ -15,7 +15,7 @@ import time
 import os
 import psutil
 from pandas.core.frame import DataFrame
-from .managers_decorators import Resources
+from shareable.managers_decorators import Resources
 
 
 class AbstractShared(ABC):
@@ -95,11 +95,17 @@ class Shared(AbstractShared):
         :return:
             self
         """
-        with Resources(self.ADDR, authkey=self.SECRET) as message:
-            counter = 0
-            while counter == 0:
-                self.rec_queue.append(message)
-                counter = 1
+        while True:
+            try:
+                with Resources(self.ADDR, authkey=self.SECRET) as message:
+                    counter = 0
+                    while counter == 0:
+                        self.rec_queue.append(message)
+                        counter = 1
+                    break
+            except OSError:
+                self.ADDR[1] += 1
+                print(f"Socket {(self.ADDR[1] - 1)} is in use, trying {self.ADDR[1]}")
 
     def send(self, value):
         """
