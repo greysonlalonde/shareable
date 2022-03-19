@@ -19,7 +19,7 @@ from shareable.managers_decorators import Resources
 
 
 class AbstractShared(ABC):
-    """abstraction of shared objects"""
+    """Abstraction of shared objects."""
 
     @classmethod
     def __init_subclass__(cls):
@@ -41,7 +41,7 @@ class AbstractShared(ABC):
         """
         Starts a shared memory instance
         :return:
-            self
+            None
         """
         raise NotImplementedError
 
@@ -50,7 +50,7 @@ class AbstractShared(ABC):
         """
         Starts a listener for a second shared memory instance
         :return:
-            self
+            None
         """
         raise NotImplementedError
 
@@ -61,7 +61,7 @@ class AbstractShared(ABC):
         :param value:
             shared_memory name
         :return:
-            self
+            None
         """
         raise NotImplementedError
 
@@ -109,7 +109,8 @@ class Shared(AbstractShared):
 
     def send(self, value):
         """
-        Sends a message holding the shared memory process name
+        Sends a message holding the shared memory process name.
+
         :param value:
             shared_memory name
         :return:
@@ -121,7 +122,8 @@ class Shared(AbstractShared):
 
     def clean_up(self):
         """
-        Cleans up threads and shared memory process on exit
+        Cleans up threads and shared memory process on exit.
+
         :return:
             None
         """
@@ -135,7 +137,9 @@ class Shared(AbstractShared):
 
 
 class SharedOne(Shared):
-    """shared object child, starts shared mem process"""
+    """
+    Shared object child, starts shared mem process.
+    """
 
     def __init__(self, obj):
         self.obj = obj
@@ -146,9 +150,10 @@ class SharedOne(Shared):
 
     def start(self):
         """
-        Starts a shared memory instance
+        Starts a shared memory instance.
+
         :return:
-            self
+            None
         """
         self.shm.start()
         self.shared_obj = self.shm.ShareableList([self.pickled()])
@@ -163,14 +168,25 @@ class SharedOne(Shared):
                 time.sleep(5)
 
     def pop(self, key):
-        """custom method to set shared memory obj attrs"""
+        """
+        Custom pop method to set shared memory obj attrs.
+
+        :param key:
+            ...
+        :return:
+            None
+        """
         temp = pickle.loads(self.shared_obj[-1])
         temp.__delattr__(key)
         self.shared_obj[-1] = optimize(pickle.dumps(temp))
 
     def pickled(self):
-        """manually allocate memory, I haven't looked into
-        whether there is support for 'size=num' for shared_memory
+        """
+        Manually allocate memory, I haven't looked into
+        whether there is support for 'size=num' for shared_memory.
+
+        :return:
+            object
         """
         temp_space = os.urandom(1000)
         self.obj.temp_space = temp_space
@@ -178,16 +194,19 @@ class SharedOne(Shared):
 
 
 class SharedTwo(Shared):
-    """shared object child, listens for shared mem process"""
+    """
+    shared object child, listens for shared mem process
+    """
     def __init__(self):
         self.shared_obj = None
         self.shm = SharedMemoryManager()
 
     def start(self):
         """
-        Starts a shared memory instance
+        Starts a shared memory instance.
+
         :return:
-            self
+            None
         """
         self.shm.start()
         self.listen()

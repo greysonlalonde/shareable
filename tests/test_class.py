@@ -1,4 +1,7 @@
 class Test:
+    """
+    Class for tests.
+    """
     def __init__(self, name, age, s):
         self.name = name
         self.age = age

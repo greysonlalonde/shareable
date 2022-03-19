@@ -7,12 +7,15 @@ from shareable.shared_objects import SharedOne, SharedTwo
 
 
 class AbstractProducer(ABC):
-    """abstraction for producer"""
+    """
+    Abstraction for producer
+    """
 
     @abstractmethod
     def shared_state_a(self):
         """
-        get shared object for shared memory creations
+        Get shared object for shared memory creations.
+
         :return:
             SharedOne
         """
@@ -21,7 +24,8 @@ class AbstractProducer(ABC):
     @abstractmethod
     def shared_state_b(self):
         """
-        get shared object for shared memory connection
+        Get shared object for shared memory connection.
+
         :return:
             SharedTwo
         """
@@ -29,11 +33,14 @@ class AbstractProducer(ABC):
 
 
 class SimpleProducer(AbstractProducer):
-    """implementation of producer"""
+    """
+    Implementation of producer.
+    """
 
     def shared_state_a(self, *args):
         """
-        get shared object for shared memory creations
+        Get shared object for shared memory creations.
+
         :param args:
             object
         :return:
@@ -43,7 +50,8 @@ class SimpleProducer(AbstractProducer):
 
     def shared_state_b(self):
         """
-        get shared object for shared memory connection
+        Get shared object for shared memory connection.
+
         :return:
             SharedTwo
         """

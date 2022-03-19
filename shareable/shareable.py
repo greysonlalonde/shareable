@@ -39,14 +39,20 @@ class Shareable:
 
     def run(self):
         """
-        interface to shared obj start method
+        Interface to shared obj start method.
+
+        :return:
+            None
         """
         self.shared_state.start()
         print("Connection established")
 
     def methods(self):
         """
-        get all methods belonging to a shared obj
+        Get all methods belonging to a shared obj.
+
+        :return:
+            list
         """
         method_list = [
             method
@@ -57,25 +63,47 @@ class Shareable:
 
     def shared_elements(self):
         """
-        laod shared obj from pickle
+        Load shared obj from pickle.
+
+        :return:
+            shared obj
         """
         return pickle.loads(self.shared_state.shared_obj[-1])
 
     def __delitem__(self, key):
         """
         del method
+
+        :param key:
+            ...
+        :return:
+            None
         """
         self.__delattr__(key)
 
     def __getitem__(self, key):
         """
         getter method
+
+        :param key:
+            ...
+        :return:
+            attr
         """
         return getattr(self.shared_elements(), key)
 
     def __setitem__(self, key, value, inplace=False):
         """
         setter method
+
+        :param key:
+            ...
+        :param value:
+            ...
+        :param inplace:
+            bool
+        :return:
+            None
         """
         obj = self.shared_elements()
         obj.__setattr__(key, value)
@@ -84,6 +112,9 @@ class Shareable:
     def __str__(self):
         """
         __str__ method
+
+        :return:
+            str`
         """
         if not self.shared_state.shared_obj:
             string = "Shared object does not exist"
@@ -94,6 +125,9 @@ class Shareable:
     def __repr__(self):
         """
         repr method
+
+        :return:
+            str
         """
         if not self.shared_state.shared_obj:
             obj_repr = "Shared state does not exist"
@@ -107,6 +141,9 @@ class Shareable:
     def __enter__(self):
         """
         enter method
+
+        :return:
+            self
         """
         return self
 
