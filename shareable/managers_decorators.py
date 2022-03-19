@@ -12,13 +12,21 @@ import atexit
 
 
 def on_start(cls):
-    """starts shared_memory multiprocessing instance & run methods"""
+    """
+    Starts shared_memory multiprocessing instance & run methods.
+
+    :param cls:
+        cls
+    :return:
+        ...
+    """
 
     @wraps(cls)
     def inner(*args, **kwargs):
         method = None
         for key in cls.__dict__.keys():
             if key == "run":
+                # starts and registers thread for cleanup
                 try:
                     method = cls(*args, **kwargs)
                     thread = Thread(target=getattr(method, key))
@@ -43,12 +51,45 @@ class Resources(Listener):
         self.conn = self.accept()
 
     def __enter__(self):
+        """
+        __enter__ method
+
+        :return:
+            bool
+        """
         return self.conn.recv()
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
+        """
+        __exit__ method
+
+        :param exc_type:
+            str
+        :param exc_value:
+            str
+        :param exc_traceback:
+            str
+        :return:
+            None
+        """
         self.conn.close()
         self.close()
 
 
 if __name__ == "__main__":
     ...
+
+
+class Run:
+    """
+
+    """
+
+    def __init__(self):
+        """
+
+        """
+        pass
+
+    def passed(self, help):
+        ...
