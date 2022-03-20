@@ -13,10 +13,9 @@ import atexit
 
 def on_start(cls):
     """
-    Starts shared_memory multiprocessing instance & run methods.
+    Starts shared_memory multiprocessing instance,
+    run methods and registers instance for cleanup.
 
-    :param cls:
-        cls
     :return:
         ...
     """
@@ -74,22 +73,3 @@ class Resources(Listener):
         """
         self.conn.close()
         self.close()
-
-
-if __name__ == "__main__":
-    ...
-
-
-class Run:
-    """
-
-    """
-
-    def __init__(self):
-        """
-
-        """
-        pass
-
-    def passed(self, help):
-        ...

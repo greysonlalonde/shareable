@@ -32,10 +32,8 @@ class Shareable:
 
         if not isinstance(obj, type(None)):
             self.shared_state = factory.shared_state_a(obj)
-        elif isinstance(obj, type(None)):
-            self.shared_state = factory.shared_state_b()
         else:
-            raise Warning
+            self.shared_state = factory.shared_state_b()
 
     def run(self):
         """
@@ -116,11 +114,11 @@ class Shareable:
         :return:
             str`
         """
-        if not self.shared_state.shared_obj:
-            string = "Shared object does not exist"
-        else:
-            string = str(self.shared_elements())
-        return string
+        return (
+            "Shared object does not exist"
+            if not self.shared_state.shared_obj
+            else str(self.shared_elements())
+        )
 
     def __repr__(self):
         """

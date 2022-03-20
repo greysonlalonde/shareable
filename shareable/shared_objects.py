@@ -95,6 +95,7 @@ class Shared(AbstractShared):
         :return:
             self
         """
+        socket = self.ADDR[1]
         while True:
             try:
                 with Resources(self.ADDR, authkey=self.SECRET) as message:
@@ -104,8 +105,8 @@ class Shared(AbstractShared):
                         counter = 1
                     break
             except OSError:
-                self.ADDR[1] += 1
-                print(f"Socket {(self.ADDR[1] - 1)} is in use, trying {self.ADDR[1]}")
+                socket += 1
+                print(f"Socket {(socket - 1)} is in use, trying {socket}")
 
     def send(self, value):
         """
@@ -197,6 +198,7 @@ class SharedTwo(Shared):
     """
     shared object child, listens for shared mem process
     """
+
     def __init__(self):
         self.shared_obj = None
         self.shm = SharedMemoryManager()
@@ -212,7 +214,3 @@ class SharedTwo(Shared):
         self.listen()
         name = self.rec_queue[0]
         self.shared_obj = ShareableList(name=name)
-
-
-if __name__ == "__main__":
-    ...
