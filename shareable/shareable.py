@@ -3,9 +3,12 @@ Shareable
 ---------
 """
 import pickle
+import logging
 from pickletools import optimize
 from shareable.producers import SimpleProducer
 from shareable.managers_decorators import on_start
+
+logging.basicConfig(level=logging.INFO)
 
 
 @on_start
@@ -43,7 +46,7 @@ class Shareable:
             None
         """
         self.shared_state.start()
-        print("Connection established")
+        logging.info("Connection established")
 
     def methods(self):
         """

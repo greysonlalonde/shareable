@@ -8,7 +8,10 @@ Resources
 from multiprocessing.connection import Listener
 from threading import Thread
 from functools import wraps
+import logging
 import atexit
+
+logging.basicConfig(level=logging.INFO)
 
 
 def on_start(cls):
@@ -33,7 +36,7 @@ def on_start(cls):
                     thread.start()
                     atexit.register(method.shared_state.clean_up)
                 except FileNotFoundError:
-                    print("Shared object space has not been allocated")
+                    logging.info("Shared object space has not been allocated")
                     break
         return method
 

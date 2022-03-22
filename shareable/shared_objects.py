@@ -9,6 +9,7 @@ from multiprocessing.shared_memory import ShareableList
 from multiprocessing.managers import SharedMemoryManager
 from multiprocessing.connection import Client
 from abc import ABC, abstractmethod
+import logging
 from pickletools import optimize
 import pickle
 import time
@@ -16,6 +17,8 @@ import os
 import psutil
 from pandas.core.frame import DataFrame
 from shareable.managers_decorators import Resources
+
+logging.basicConfig(level=logging.INFO)
 
 
 class AbstractShared(ABC):
@@ -106,7 +109,7 @@ class Shared(AbstractShared):
                     break
             except OSError:
                 socket += 1
-                print(f"Socket {(socket - 1)} is in use, trying {socket}")
+                logging.info(f"Socket {(socket - 1)} is in use, trying {socket}")
 
     def send(self, value):
         """
@@ -129,12 +132,12 @@ class Shared(AbstractShared):
             None
         """
         self.shm.shutdown()
-        print("Destroyed shared resources")
+        logging.info("Destroyed shared resources")
         process = psutil.Process(self.pid)
         for i in process.children(recursive=True):
             p_temp = psutil.Process(i.pid)
             p_temp.kill()
-        print("Killed all child processes")
+        logging.info("Killed all child processes")
 
 
 class SharedOne(Shared):
