@@ -1,9 +1,11 @@
 import unittest
 from shareable.producers import SimpleProducer
-from shareable.shared_objects import SharedOne, SharedTwo
+from shareable.shared_objects import Shared, SharedOne, SharedTwo
 from tests.test_class import Test
 
 test_class = Test("Nobody", 100, 100)
+SHARED_ATTRS = ("ADDR", "SECRET", "shm", "shared_obj", "sent_queue", "rec_queue", "pid", "pidl")
+shared = Shared()
 
 
 class TestDecorators(unittest.TestCase):
@@ -36,6 +38,12 @@ class TestProducer(unittest.TestCase):
         factory = SimpleProducer()
         obj = factory.shared_state_b()
         self.assertIsInstance(obj, SharedTwo)
+
+
+class TestShared(unittest.TestCase):
+    def test_shared_attrs(self):
+        for attr in SHARED_ATTRS:
+            self.assertTrue(hasattr(shared, attr), msg=f'obj lacking an attr. obj: {shared}, attr: {attr}')
 
 
 if __name__ == '__main__':

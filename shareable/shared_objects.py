@@ -18,7 +18,7 @@ import psutil
 from pandas.core.frame import DataFrame
 from shareable.managers_decorators import Resources
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(format='%(message)s', level=logging.INFO)
 
 
 class AbstractShared(ABC):

@@ -8,7 +8,8 @@ from pickletools import optimize
 from shareable.producers import SimpleProducer
 from shareable.managers_decorators import on_start
 
-logging.basicConfig(level=logging.INFO)
+
+logging.basicConfig(format='%(message)s', level=logging.INFO)
 
 
 @on_start

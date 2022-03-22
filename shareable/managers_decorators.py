@@ -11,7 +11,7 @@ from functools import wraps
 import logging
 import atexit
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(format='%(message)s', level=logging.INFO)
 
 
 def on_start(cls):
