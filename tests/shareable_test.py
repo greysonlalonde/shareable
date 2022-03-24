@@ -4,7 +4,7 @@ from shareable.shared_objects import Shared, SharedOne, SharedTwo
 from tests.test_class import Test
 
 test_class = Test("Nobody", 100, 100)
-SHARED_ATTRS = ("ADDR", "SECRET", "shm", "shared_obj", "sent_queue", "rec_queue", "pid", "pidl")
+SHARED_ATTRS = ("ADDR", "SECRET", "shm", "shared_obj", "sent_queue", "rec_queue", "pid")
 shared = Shared()
 
 
