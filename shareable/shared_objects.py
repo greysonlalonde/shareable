@@ -150,7 +150,8 @@ class SharedOne(Shared):
         self.shareable = self.pickled()
         self.pid = os.getpid()
         self.shm = SharedMemoryManager()
-        self.shared_obj = None
+        self.shm.start()
+        self.shared_obj = self.shm.ShareableList([self.pickled()])
 
     def start(self):
         """
@@ -159,8 +160,6 @@ class SharedOne(Shared):
         :return:
             None
         """
-        self.shm.start()
-        self.shared_obj = self.shm.ShareableList([self.pickled()])
         if not isinstance(self.obj, DataFrame):
             self.pop("temp_space")
         iteration = 0
@@ -194,6 +193,10 @@ class SharedOne(Shared):
         """
         temp_space = os.urandom(1000)
         self.obj.temp_space = temp_space
+        # if not isinstance(dict, self.obj):
+        #     self.obj.temp_space = temp_space
+        # else:
+        #     self.obj['temp_space'] = temp_space
         return optimize(pickle.dumps(self.obj))
 
 
