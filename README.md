@@ -1,6 +1,6 @@
 shareable
 ===========================
-[![alt text](https://img.shields.io/badge/pypi-0.3.a0-blue)](https://pypi.org/project/shareable) [![alt text](https://img.shields.io/badge/license-MIT-green)](https://github.com/greysonlalonde/shareable/blob/main/LICENSE)
+[![alt text](https://img.shields.io/badge/pypi-0.6.a0-blue)](https://pypi.org/project/shareable) [![alt text](https://img.shields.io/badge/license-MIT-green)](https://github.com/greysonlalonde/shareable/blob/main/LICENSE)
  
 Dynamic python object access & manipulation across threads/processes
 ---
