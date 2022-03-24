@@ -9,7 +9,7 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 setup(
     name="shareable",
     url="https://github.com/greysonlalonde/shareable",
-    download_url="https://github.com/greysonlalonde/shareable/v0.4-alpha.tar.gz",
+    download_url="https://github.com/greysonlalonde/shareable/v0.5-alpha.tar.gz",
     author="Greyson R. LaLonde",
     author_email="greyson.r.lalonde@gmail.com",
     packages=find_packages(),
